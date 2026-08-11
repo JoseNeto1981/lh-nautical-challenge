@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+env/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Dados brutos (se forem muito pesados para o Git)
+data/raw/*.csv
+
+# Ambiente
+.env
+
+# VS Code
+.vscode/
+
+# SO
+.DS_Store
+Thumbs.db
+
+# Outputs temporários
+*.log
+# Dados do desafio (arquivos brutos)
+lh-nautical-challenge/*.csv
+lh-nautical-challenge/*.zip
