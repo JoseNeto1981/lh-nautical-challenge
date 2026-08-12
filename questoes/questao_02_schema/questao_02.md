@@ -116,11 +116,11 @@ Essa validação confirma que o `schema.sql` gerado pelo script não é apenas u
 
 ## Script utilizado
 
-Ver arquivo `gerar_schema.py` nesta mesma pasta.
+Ver arquivo `generate_schema.py` nesta mesma pasta.
 
 Uso:
 ```bash
-python gerar_schema.py
+python generate_schema.py
 ```
 
 O script lê os CSVs do diretório configurado em `INPUT_DIR` (`data/raw`) e escreve o resultado em `OUTPUT_FILE` (`sql/schema.sql`).
