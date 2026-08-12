@@ -117,6 +117,45 @@ Pontos confirmados nessa amostra:
 - **Nulo preservado sem tratamento**: a linha 1 tem `salesperson_id` vazio — exatamente como especificado na premissa de não tratar nulos. O dado ausente permanece ausente, não foi preenchido nem removido.
 - **Nenhuma corrupção de caractere** nos campos de texto (`ecommerce`, `pos`, `paid`, `confirmed`).
 
+## Questão 3.2 - Validação
+
+**Pergunta:** Qual o total de linhas somadas das seguintes tabelas: `customers`, `orders`, `order_items` e `payments`?
+
+Consulta executada diretamente no container PostgreSQL:
+
+```bash
+docker exec -it lh-postgres psql -U postgres -d lh_nautical -c "SELECT (SELECT COUNT(*) FROM customers) + (SELECT COUNT(*) FROM order_items) + (SELECT COUNT(*) FROM orders) + (SELECT COUNT(*) FROM payments) AS total_linhas_somadas;"
+```
+
+Query em formato SQL puro (equivalente, para leitura):
+```sql
+SELECT
+    (SELECT COUNT(*) FROM customers) +
+    (SELECT COUNT(*) FROM order_items) +
+    (SELECT COUNT(*) FROM orders) +
+    (SELECT COUNT(*) FROM payments) AS total_linhas_somadas;
+```
+
+Resultado retornado pelo terminal:
+```
+ total_linhas_somadas 
+----------------------
+               251864
+(1 row)
+```
+
+| Tabela | Linhas |
+|---|---:|
+| customers | 2.000 |
+| orders | 48.998 |
+| order_items | 147.320 |
+| payments | 53.546 |
+| **Total somado** | **251.864** |
+
+**Resposta: 251.864 linhas.**
+
+Esse valor bate exatamente com a soma dos totais individuais já registrados na carga (Questão 3.1), confirmando que nenhuma linha foi perdida ou duplicada entre a carga inicial e essa checagem — reforçando a integridade do processo de carregamento.
+
 ## Conclusão
 
 O carregamento foi concluído com sucesso para as 24 tabelas, com volumes e valores consistentes com os dados de origem. Como o schema da Questão 2 não define `FOREIGN KEY` (apenas `PRIMARY KEY`), não houve necessidade de respeitar uma ordem específica de carregamento entre tabelas — cada CSV foi carregado de forma independente. O banco está agora pronto para servir de base às análises relacionais das próximas etapas do desafio.
