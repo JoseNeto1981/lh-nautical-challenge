@@ -10,7 +10,7 @@ A LH Nautical é uma empresa fictícia de varejo náutico cujos dados operaciona
 
 ## Principais achados
 
-| # | Achado | Impacto |
+| # | Insights | Impacto |
 |---|---|---|
 | 1 | A base de dados brutos tem boa integridade (sem nulos, sem negativos), mas contém uma data futura suspeita e ao menos um caso de produto duplicado no cadastro. | Confiabilidade dos dados |
 | 2 | Entre os 10 clientes mais fiéis (maior ticket médio, compram em 14+ categorias), **Hélices** é a categoria mais vendida. | Estratégia comercial |
