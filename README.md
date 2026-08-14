@@ -2,7 +2,7 @@
 
 Resolução completa do case técnico da LH Nautical: um pipeline de dados de ponta a ponta, da ingestão bruta de 24 arquivos CSV até insights preditivos e um sistema de recomendação, entregue para dar suporte a decisões reais de negócio.
 
-**[Relatório final consolidado →](relatorio_final/relatorio_final_completo.docx)**
+**[Relatório final consolidado →](relatorio_final/relatorio_final_completo.pdf)**
 
 ## Sobre o desafio
 
@@ -18,7 +18,7 @@ A LH Nautical é uma empresa fictícia de varejo náutico cujos dados operaciona
 | 4 | O baseline de previsão (média móvel) **subestimou sistematicamente** as vendas do 1º trimestre de 2026 (149 previstas vs. 207 reais). | Risco de ruptura de estoque |
 | 5 | A recomendação por similaridade aponta outro motor de popa — não uma defensa — como produto mais associado ao Motor de Popa 1949. | Estratégia de cross-sell |
 
-Detalhamento completo de cada achado no [relatório final](relatorio_final/relatorio_final_completo.docx).
+Detalhamento completo de cada achado no [relatório final](relatorio_final/relatorio_final_completo.pdf).
 
 ## Pipeline e stack técnica
 
