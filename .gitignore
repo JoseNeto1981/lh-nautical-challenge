@@ -26,3 +26,4 @@ Thumbs.db
 # Dados do desafio (arquivos brutos)
 lh-nautical-challenge/*.csv
 lh-nautical-challenge/*.zip
+~$*
