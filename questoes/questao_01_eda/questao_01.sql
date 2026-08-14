@@ -19,7 +19,7 @@ SELECT
     COUNT(*) FILTER (WHERE total < 0) AS negativos_total
 FROM orders;
 
--- Checagem geral de nulos (repita por coluna relevante)
+-- Checagem geral de nulos 
 SELECT 
     COUNT(*) - COUNT(created_at) AS nulos_created_at,
     COUNT(*) - COUNT(total) AS nulos_total

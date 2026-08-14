@@ -1,19 +1,9 @@
--- ============================================================
--- Questao 5 - Dimensao de Calendario
--- LH Nautical
--- ============================================================
--- Cenario: identificar o dia da semana com pior media de vendas
--- nas lojas fisicas (POS), corrigindo o erro do estagiario que
--- ignorou dias sem venda ao calcular a media.
--- ============================================================
 
-
--- ============================================================
--- PARTE 1 - Construcao da dimensao de datas (calendario)
+-- Construcao da dimensao de datas (calendario)
 -- Periodo: da menor data de venda ate a data atual do arquivo
 -- (MAX(placed_at)), cobrindo todos os dias corridos, incluindo
 -- fins de semana, MESMO que nao tenham venda registrada.
--- ============================================================
+
 
 WITH periodo AS (
     SELECT
@@ -43,11 +33,9 @@ SELECT *
 FROM calendario
 ORDER BY data_calendario;
 
-
--- ============================================================
--- PARTE 2 - LEFT JOIN do calendario com as vendas (lojas fisicas)
+-- LEFT JOIN do calendario com as vendas (lojas fisicas)
 -- Agregacao de vendas por dia, com dias sem venda = 0.
--- ============================================================
+
 
 WITH periodo AS (
     SELECT
@@ -73,10 +61,7 @@ calendario AS (
     CROSS JOIN LATERAL generate_series(p.data_inicial, p.data_final, interval '1 day') AS gs
 ),
 
--- Vendas diarias: soma do valor de venda por dia, somente lojas
--- fisicas (channel = 'pos'). Agrega ANTES do LEFT JOIN com o
--- calendario, para nao duplicar linhas do calendario caso um
--- dia tenha mais de um pedido.
+
 vendas_diarias AS (
     SELECT
         placed_at::date AS data_venda,
@@ -95,11 +80,9 @@ LEFT JOIN vendas_diarias v ON v.data_venda = c.data_calendario
 ORDER BY c.data_calendario;
 
 
--- ============================================================
--- PARTE 3 - Media de vendas por dia da semana
+-- Media de vendas por dia da semana
 -- Considera TODOS os dias do calendario (inclusive os com
 -- venda = 0), respondendo a pergunta do Sr. Almir.
--- ============================================================
 
 WITH periodo AS (
     SELECT

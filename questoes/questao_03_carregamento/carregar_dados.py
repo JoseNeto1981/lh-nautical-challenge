@@ -4,13 +4,8 @@ import sys
 import glob
 import psycopg2
 
-# ---------- Configurações ----------
-# Mesmo diretório de origem usado na Questão 2, para manter consistência
-# entre o schema gerado e os dados carregados.
 INPUT_DIR = "data/raw"
 
-# Parâmetros de conexão. Podem ser sobrescritos por variáveis de ambiente,
-# para não deixar credenciais fixas no código-fonte.
 DB_CONFIG = {
     "host": os.getenv("PGHOST", "localhost"),
     "port": os.getenv("PGPORT", "5432"),
@@ -51,9 +46,7 @@ def load_csv(cursor, filepath: str):
     table_name = sanitize_identifier(os.path.splitext(os.path.basename(filepath))[0])
     print(f"Carregando {filepath} -> tabela '{table_name}'...")
 
-    # TRUNCATE antes da carga: torna o script reexecutável sem violar a
-    # PRIMARY KEY em uma segunda execução. Não é "tratamento de dado" --
-    # apenas garante idempotência do carregamento em si.
+
     cursor.execute(f"TRUNCATE TABLE {table_name} RESTART IDENTITY CASCADE;")
 
     with open(filepath, "r", encoding="utf-8") as f:

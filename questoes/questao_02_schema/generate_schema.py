@@ -4,11 +4,10 @@ import re
 import glob
 from datetime import datetime
 
-# ---------- Configurações ----------
+#  Configurações
 INPUT_DIR = "data/raw"
 OUTPUT_FILE = "sql/schema.sql"
 
-# Formatos de data/hora aceitos, do mais específico para o mais genérico
 DATE_FORMATS = [
     "%Y-%m-%d",
     "%d/%m/%Y",
@@ -21,28 +20,23 @@ TIMESTAMP_FORMATS = [
 
 BOOLEAN_VALUES = {"true", "false", "0", "1", "yes", "no", "t", "f"}
 
-# Fragmentos de nome de coluna que indicam um identificador/documento,
-# mesmo quando o conteúdo parece numérico (CPF, telefone, código de barras
-# etc. podem ter zeros à esquerda e nunca são usados em cálculo, então
-# devem ser tratados como texto, não como número).
 IDENTIFIER_NAME_HINTS = {
     "cpf", "cnpj", "tax_id", "phone", "telefone", "barcode", "ean",
     "zip", "zipcode", "postal_code", "cep", "document", "documento",
     "nfe_access_key", "rg",
 }
 
-# Nomes de coluna considerados candidatos naturais a chave primária
 PK_CANDIDATE_NAMES = {"id"}
 
 
 def sanitize_identifier(name: str) -> str:
     """Normaliza nomes de coluna/tabela para o padrão do Postgres."""
     name = name.strip().lower()
-    name = re.sub(r"[^\w]+", "_", name)   # espaços/símbolos -> underscore
+    name = re.sub(r"[^\w]+", "_", name)   
     name = re.sub(r"_+", "_", name).strip("_")
     if not name:
         name = "col"
-    if name[0].isdigit():                  # Postgres não aceita identificador iniciando com número
+    if name[0].isdigit():                 
         name = f"col_{name}"
     return name
 
@@ -102,18 +96,12 @@ def infer_column_type(column_name: str, values: list) -> str:
     non_empty = [v.strip() for v in values if v is not None and v.strip() != ""]
 
     if not non_empty:
-        return "TEXT"  # coluna inteiramente vazia na amostra: fallback seguro
+        return "TEXT" 
 
-    # CORRECAO 1: identificadores/documentos (CPF, telefone, codigo de
-    # barras etc.) sao tratados como texto mesmo quando o conteudo parece
-    # numerico, pois podem ter zeros a esquerda e nao sao usados em calculo.
     if is_identifier_like_name(column_name):
         max_len = max(len(v) for v in non_empty)
         return "VARCHAR(255)" if max_len <= 255 else "TEXT"
-
-    # CORRECAO 2: boolean e checado ANTES de int. Sem isso, colunas
-    # booleanas representadas como "0"/"1" seriam classificadas como
-    # INTEGER, ja que is_int("0") e is_int("1") tambem retornam True.
+.
     if all(is_boolean(v) for v in non_empty):
         return "BOOLEAN"
 
@@ -130,7 +118,7 @@ def infer_column_type(column_name: str, values: list) -> str:
     if all(matches_timestamp(v) for v in non_empty):
         return "TIMESTAMP"
 
-    # Fallback: texto. Usa VARCHAR(255) se valores curtos, senao TEXT
+    
     max_len = max(len(v) for v in non_empty)
     return "VARCHAR(255)" if max_len <= 255 else "TEXT"
 
@@ -147,16 +135,12 @@ def read_csv_full(filepath: str):
 def generate_create_table(table_name: str, header: list, rows: list) -> str:
     columns = [sanitize_identifier(col) for col in header]
 
-    # Transpõe as linhas para ter, por coluna, a lista de valores
     col_values = {i: [] for i in range(len(columns))}
     for row in rows:
         for i in range(len(columns)):
             value = row[i] if i < len(row) else ""
             col_values[i].append(value)
 
-    # CORRECAO 3: deteccao de PRIMARY KEY / NOT NULL.
-    # Uma coluna e candidata a PK quando: o nome original e "id", todos os
-    # valores sao preenchidos (sem vazios) e todos sao unicos.
     pk_index = None
     for i, original_name in enumerate(header):
         if original_name.strip().lower() in PK_CANDIDATE_NAMES:
@@ -172,8 +156,7 @@ def generate_create_table(table_name: str, header: list, rows: list) -> str:
     for i, col_name in enumerate(columns):
         col_type = infer_column_type(header[i], col_values[i])
 
-        # NOT NULL: aplicado quando a coluna nao teve nenhum valor vazio
-        # na amostra lida (alem de ser sempre aplicado a PK, abaixo)
+        
         values = col_values[i]
         non_empty = [v for v in values if v.strip() != ""]
         has_no_nulls = len(non_empty) == len(values) and len(values) > 0

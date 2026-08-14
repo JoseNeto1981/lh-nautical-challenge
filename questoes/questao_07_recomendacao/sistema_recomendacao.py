@@ -5,7 +5,8 @@ import numpy as np
 import psycopg2
 from sklearn.metrics.pairwise import cosine_similarity
 
-# ---------- Configurações ----------
+# Configurações 
+
 PRODUTO_REFERENCIA = "Motor de Popa 1949"
 TOP_N = 5
 
@@ -17,10 +18,8 @@ DB_CONFIG = {
     "password": os.getenv("PGPASSWORD", "postgres"),
 }
 
+# Matriz de interacao Usuario x Produto
 
-# ---------------------------------------------------------------------------
-# Etapa 1: matriz de interacao Usuario x Produto
-# ---------------------------------------------------------------------------
 
 def carregar_pares_cliente_produto(conn) -> pd.DataFrame:
     """Traz do banco todos os pares (customer_id, product_id, product_name)
@@ -66,10 +65,8 @@ def construir_matriz_usuario_produto(pares: pd.DataFrame) -> pd.DataFrame:
 
     return matriz.astype(int)
 
+# Similaridade de cosseno entre produtos
 
-# ---------------------------------------------------------------------------
-# Etapa 2: similaridade de cosseno entre produtos
-# ---------------------------------------------------------------------------
 
 def calcular_similaridade_produtos(matriz_usuario_produto: pd.DataFrame) -> pd.DataFrame:
     """Calcula a similaridade de cosseno PRODUTO x PRODUTO, com base nos
@@ -89,9 +86,7 @@ def calcular_similaridade_produtos(matriz_usuario_produto: pd.DataFrame) -> pd.D
     )
 
 
-# ---------------------------------------------------------------------------
-# Etapa 3: ranking de produtos similares
-# ---------------------------------------------------------------------------
+# Ranking de produtos similares
 
 def obter_ranking_similares(
     similaridade: pd.DataFrame,
@@ -113,9 +108,6 @@ def obter_ranking_similares(
     return ranking
 
 
-# ---------------------------------------------------------------------------
-# Execucao principal
-# ---------------------------------------------------------------------------
 
 def main():
     conn = psycopg2.connect(**DB_CONFIG)
@@ -124,7 +116,6 @@ def main():
         pares = carregar_pares_cliente_produto(conn)
         print(f"  -> {len(pares)} pares distintos (cliente, produto) carregados.")
 
-        # Mapa id -> nome (para exibir o ranking com nomes, nao so IDs)
         mapa_id_para_nome = (
             pares[["product_id", "product_name"]]
             .drop_duplicates()
@@ -132,9 +123,6 @@ def main():
             .to_dict()
         )
 
-        # Alerta de seguranca: mesmo problema encontrado na Questao 6 pode
-        # se repetir aqui -- nomes de produto duplicados em product_id
-        # diferentes.
         candidatos = pares.loc[
             pares["product_name"] == PRODUTO_REFERENCIA, "product_id"
         ].unique()
@@ -179,4 +167,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-    

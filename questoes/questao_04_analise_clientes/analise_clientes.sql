@@ -1,18 +1,5 @@
--- ============================================================
--- Questao 4 - Analise de Clientes Fieis
--- LH Nautical
--- ============================================================
--- Cenario: identificar clientes fieis (ticket medio alto +
--- diversidade de categorias >= 13) e mapear o que esse grupo
--- de elite mais consome, para replicar o comportamento em
--- outros segmentos.
--- ============================================================
-
-
--- ============================================================
--- PARTE 1 - Ticket Medio e Diversidade de Categorias por cliente
+--  Ticket Medio e Diversidade de Categorias por cliente
 -- (todos os clientes, sem filtro de elite)
--- ============================================================
 
 WITH faturamento_frequencia AS (
     SELECT
@@ -50,11 +37,10 @@ FROM metrica_cliente
 ORDER BY ticket_medio DESC, customer_id ASC;
 
 
--- ============================================================
--- PARTE 2 - Filtro dos 10 clientes "Fieis"
+--  Filtro dos 10 clientes "Fieis"
 -- Criterio: diversidade >= 13 categorias, maior Ticket Medio.
 -- Desempate: customer_id crescente.
--- ============================================================
+
 
 WITH faturamento_frequencia AS (
     SELECT
@@ -94,10 +80,9 @@ ORDER BY ticket_medio DESC, customer_id ASC
 LIMIT 10;
 
 
--- ============================================================
 -- PARTE 3 - Categoria com maior SUM(quantity) entre os 10
 -- clientes fieis identificados na Parte 2.
--- ============================================================
+
 
 WITH faturamento_frequencia AS (
     SELECT

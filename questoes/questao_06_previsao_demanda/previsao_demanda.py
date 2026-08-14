@@ -4,25 +4,13 @@ from collections import OrderedDict
 
 import psycopg2
 
-# ---------- Configurações ----------
-# ATENCAO: existem 2 produtos distintos (id 74 e id 240) cadastrados com
-# EXATAMENTE o mesmo nome "Bussola de Bordo 702" -- SKUs, precos e
-# historico de vendas proprios e diferentes entre si, mas nome e
-# descricao identicos (aparenta ser uma falha de cadastro no ERP de
-# origem, nao um produto novo substituindo o antigo -- ambos tem vendas
-# desde 2020). Como o enunciado se refere ao produto pelo NOME, a
-# decisao tomada foi agregar as vendas de AMBOS os product_id como uma
-# unica serie temporal (a query abaixo filtra por p.name, nao por
-# p.id, entao essa soma acontece naturalmente no GROUP BY por mes).
-# Essa ambiguidade de cadastro esta documentada no questao_06.md.
+
 PRODUTO_ALVO = "Bússola de Bordo 702"
 
-# A data de "corte" entre treino e teste. O periodo de treino vai ate
-# 31/12/2025; o teste cobre o 1o trimestre de 2026 (Jan, Fev, Mar).
 DATA_FIM_TREINO = date(2025, 12, 31)
 MESES_TESTE = [date(2026, 1, 1), date(2026, 2, 1), date(2026, 3, 1)]
 
-JANELA_MEDIA_MOVEL = 3  # meses
+JANELA_MEDIA_MOVEL = 3  
 
 DB_CONFIG = {
     "host": os.getenv("PGHOST", "localhost"),
@@ -32,10 +20,7 @@ DB_CONFIG = {
     "password": os.getenv("PGPASSWORD", "postgres"),
 }
 
-
-# ---------------------------------------------------------------------------
-# Etapa 1: dataset unificado
-# ---------------------------------------------------------------------------
+# Dataset unificado
 
 def carregar_vendas_mensais(conn, nome_produto: str) -> "OrderedDict[date, float]":
     """Une products, product_variants, orders e order_items para obter a
@@ -60,8 +45,7 @@ def carregar_vendas_mensais(conn, nome_produto: str) -> "OrderedDict[date, float
         GROUP BY DATE_TRUNC('month', o.placed_at)
         ORDER BY mes;
     """
-    # Limite superior: primeiro dia do mes seguinte ao ultimo mes de teste,
-    # para incluir Mar/2026 por completo.
+   
     limite_superior = date(2026, 4, 1)
 
     with conn.cursor() as cur:
@@ -99,9 +83,7 @@ def preencher_meses_sem_venda(vendas_por_mes: "OrderedDict[date, float]") -> "Or
     return serie_completa
 
 
-# ---------------------------------------------------------------------------
-# Etapa 2 e 3: baseline de media movel + previsao do 1o trimestre de 2026
-# ---------------------------------------------------------------------------
+# Baseline de media movel + previsao do 1o trimestre de 2026
 
 def media_movel(serie: "OrderedDict[date, float]", mes_previsto: date, janela: int) -> float:
     """Calcula a media dos 'janela' meses IMEDIATAMENTE ANTERIORES ao mes
@@ -135,9 +117,9 @@ def gerar_previsoes(serie_treino_e_real: "OrderedDict[date, float]", meses_teste
     return previsoes
 
 
-# ---------------------------------------------------------------------------
-# Etapa 4: comparacao com o realizado (MAE)
-# ---------------------------------------------------------------------------
+
+# Comparacao com o realizado (MAE)
+
 
 def calcular_mae(previsoes: "OrderedDict[date, float]", realizados: "OrderedDict[date, float]") -> float:
     erros_absolutos = []
@@ -146,10 +128,6 @@ def calcular_mae(previsoes: "OrderedDict[date, float]", realizados: "OrderedDict
         erros_absolutos.append(abs(previsto - real))
     return sum(erros_absolutos) / len(erros_absolutos)
 
-
-# ---------------------------------------------------------------------------
-# Execucao principal
-# ---------------------------------------------------------------------------
 
 def main():
     conn = psycopg2.connect(**DB_CONFIG)
@@ -164,11 +142,9 @@ def main():
             marcador = "[TREINO]" if mes.year < 2026 else "[TESTE] "
             print(f"  {marcador} {mes.strftime('%Y-%m')}: {qtd:.0f}")
 
-        # Previsao do 1o trimestre de 2026, mes a mes, via media movel
-        # dos 3 meses imediatamente anteriores.
+        
         previsoes = gerar_previsoes(serie, MESES_TESTE, JANELA_MEDIA_MOVEL)
 
-        # Valores realizados no periodo de teste (ja estao na propria serie)
         realizados = OrderedDict((mes, serie[mes]) for mes in MESES_TESTE)
 
         print("\nPrevisao (media movel 3 meses) vs. Realizado - Q1 2026:")
@@ -192,4 +168,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-    
