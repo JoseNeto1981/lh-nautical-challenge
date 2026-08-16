@@ -3,7 +3,7 @@
 Resolução completa do case técnico da LH Nautical: um pipeline de dados de ponta a ponta, da ingestão bruta de 24 arquivos CSV até insights preditivos e um sistema de recomendação, entregue para dar suporte a decisões reais de negócio.
 
 **[Relatório final consolidado →](relatorio_final/relatorio_final_completo.pdf)**
-**[Dashboard Power BI →](dashboard_powerbi/dashboard_lh_nautical.pbix)**
+**[Dashboard Power BI →](dashboard_powerbi/lh_nautical.pbix)**
 
 ## Sobre o desafio
 
@@ -19,7 +19,7 @@ A LH Nautical é uma empresa fictícia de varejo náutico cujos dados operaciona
 | 4 | O baseline de previsão (média móvel) **subestimou sistematicamente** as vendas do 1º trimestre de 2026 (149 previstas vs. 207 reais). | Risco de ruptura de estoque |
 | 5 | A recomendação por similaridade aponta outro motor de popa — não uma defensa — como produto mais associado ao Motor de Popa 1949. | Estratégia de cross-sell |
 
-Detalhamento completo de cada achado no [relatório final](relatorio_final/relatorio_final_completo.pdf) e visualização interativa no [dashboard Power BI](dashboard_powerbi/dashboard_lh_nautical.pbix).
+Detalhamento completo de cada achado no [relatório final](relatorio_final/relatorio_final_completo.pdf) e visualização interativa no [dashboard Power BI](dashboard_powerbi/lh_nautical.pbix).
 
 ## Pipeline e stack técnica
 
@@ -90,4 +90,4 @@ docker exec -i lh-postgres psql -U postgres -d lh_nautical < sql/schema.sql
 python questoes/questao_03_carregamento/carregar_dados.py
 ```
 
-A partir daí, as queries SQL de cada questão podem ser rodadas contra o banco (ex: via extensão SQLTools do VS Code), e os scripts Python de cada frente rodam de forma independente. Para o dashboard, abra `dashboard_powerbi/dashboard_lh_nautical.pbix` no Power BI Desktop com o banco já carregado e ativo.
+A partir daí, as queries SQL de cada questão podem ser rodadas contra o banco (ex: via extensão SQLTools do VS Code), e os scripts Python de cada frente rodam de forma independente. Para o dashboard, abra `dashboard_powerbi/lh_nautical.pbix` no Power BI Desktop com o banco já carregado e ativo.
