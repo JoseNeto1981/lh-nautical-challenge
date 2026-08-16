@@ -3,12 +3,13 @@
 Resolução completa do case técnico da LH Nautical: um pipeline de dados de ponta a ponta, da ingestão bruta de 24 arquivos CSV até insights preditivos e um sistema de recomendação, entregue para dar suporte a decisões reais de negócio.
 
 **[Relatório final consolidado →](relatorio_final/relatorio_final_completo.pdf)**
+**[Dashboard Power BI →](dashboard_powerbi/dashboard_lh_nautical.pbix)**
 
 ## Sobre o desafio
 
 A LH Nautical é uma empresa fictícia de varejo náutico cujos dados operacionais (2020–2026) estavam disponíveis apenas como CSVs brutos, sem banco de dados estruturado. A missão: modelar um schema, carregar os dados em um banco relacional real e responder perguntas de negócio que a diretoria precisava para tomar decisões — de estoque, de operação de loja, de retenção de clientes.
 
-## Principais achados
+## Principais insights
 
 | # | Insights | Impacto |
 |---|---|---|
@@ -18,7 +19,7 @@ A LH Nautical é uma empresa fictícia de varejo náutico cujos dados operaciona
 | 4 | O baseline de previsão (média móvel) **subestimou sistematicamente** as vendas do 1º trimestre de 2026 (149 previstas vs. 207 reais). | Risco de ruptura de estoque |
 | 5 | A recomendação por similaridade aponta outro motor de popa — não uma defensa — como produto mais associado ao Motor de Popa 1949. | Estratégia de cross-sell |
 
-Detalhamento completo de cada achado no [relatório final](relatorio_final/relatorio_final_completo.pdf).
+Detalhamento completo de cada achado no [relatório final](relatorio_final/relatorio_final_completo.pdf) e visualização interativa no [dashboard Power BI](dashboard_powerbi/dashboard_lh_nautical.pbix).
 
 ## Pipeline e stack técnica
 
@@ -30,10 +31,12 @@ Detalhamento completo de cada achado no [relatório final](relatorio_final/relat
 - **Engenharia de dados:** Python (stdlib para geração de schema; psycopg2 + COPY para carga)
 - **Análises:** SQL analítico (CTEs, window functions, generate_series) e Python (pandas, scikit-learn)
 - **Relatório final:** gerado programaticamente (docx-js) com gráficos em matplotlib
+- **Dashboard:** Power BI, conectado diretamente ao PostgreSQL via consulta nativa SQL
 
 ## Estrutura do repositório
 
 ```
+├── dashboard_powerbi/                 Dashboard Power BI (.pbix) + documentação
 ├── data/raw/                          CSVs originais, sem tratamento
 ├── docs/                              Decisões técnicas e dicionário de dados
 ├── questoes/                          Uma pasta por questão do desafio
@@ -59,6 +62,15 @@ Detalhamento completo de cada achado no [relatório final](relatorio_final/relat
 | Previsão de Demanda | Baseline de média móvel, sem data leakage, com métrica MAE | [`questao_06_previsao_demanda/`](questoes/questao_06_previsao_demanda/) |
 | Sistemas de Recomendação | Similaridade de cosseno sobre matriz usuário-produto | [`questao_07_recomendacao/`](questoes/questao_07_recomendacao/) |
 
+## Dashboard Power BI
+
+Material complementar de visualização interativa está em [`dashboard_powerbi/`](dashboard_powerbi/):
+
+- `lh_nautical.pbix` — dashboard com 5 páginas (Visão Geral, Clientes Fiéis, Vendas por Dia da Semana, Previsão de Demanda, Recomendação de Produtos)
+- `lh_nautical.md` — documentação de como foi construído e como reproduzir a conexão
+
+Conectado diretamente ao PostgreSQL via consulta nativa SQL (páginas de Visão Geral, Clientes Fiéis e Vendas por Dia da Semana); as páginas de Previsão de Demanda e Recomendação de Produtos usam os resultados já calculados em Python (média móvel e similaridade de cosseno), inseridos diretamente no Power BI.
+
 ## Como rodar
 
 Cada pasta em `questoes/` contém um `.md` com o passo a passo específico (setup do banco, dependências, comandos). Visão geral:
@@ -78,4 +90,4 @@ docker exec -i lh-postgres psql -U postgres -d lh_nautical < sql/schema.sql
 python questoes/questao_03_carregamento/carregar_dados.py
 ```
 
-A partir daí, as queries SQL de cada questão podem ser rodadas contra o banco (ex: via extensão SQLTools do VS Code), e os scripts Python de cada frente rodam de forma independente.
+A partir daí, as queries SQL de cada questão podem ser rodadas contra o banco (ex: via extensão SQLTools do VS Code), e os scripts Python de cada frente rodam de forma independente. Para o dashboard, abra `dashboard_powerbi/dashboard_lh_nautical.pbix` no Power BI Desktop com o banco já carregado e ativo.
